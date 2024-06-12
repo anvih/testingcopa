@@ -20,8 +20,7 @@ jobs:
       matrix:
         # provide relevant list of images to scan on each run
         images:
-          - "docker.io/library/alpine:3.18.4"
-          - "docker.io/library/hello-world:latest"
+          - "docker.io/openpolicyagent/opa:0.46.0"
     steps:
       # generate trivy report for fixable OS package vulnerabilities
       - name: Generate Trivy Report
@@ -41,6 +40,7 @@ jobs:
           report_file="report.json"
           vuln_count=$(jq 'if .Results then [.Results[] | select(.Class=="os-pkgs" and .Vulnerabilities!=null) | .Vulnerabilities[]] | length else 0 end' "$report_file")
           echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
         # copa action will only run if there are vulnerabilities
       - name: Run Copa action
@@ -78,3 +78,23 @@ jobs:
           # retag if needed
           docker tag ${{ steps.copa.outputs.patched-image }} ghcr.io/anvih/testingcopa/${{ steps.copa.outputs.patched-image }}
           docker push ghcr.io/anvih/testingcopa/${{ steps.copa.outputs.patched-image }}
+      - name: Generate Trivy Report again on patched image
+        uses: aquasecurity/trivy-action@d43c1f16c00cfd3978dde6c07f4bbcf9eb6993ca # 0.16.1
+        with:
+          scan-type: "image"
+          format: "json"
+          output: "report.json"
+          ignore-unfixed: true
+          vuln-type: "os"
+          image-ref: ghcr.io/anvih/testingcopa/${{ steps.copa.outputs.patched-image }}
+
+        # check whether there are any OS package vulnerabilities
+      - name: Check vulnerability count on patched image
+        id: vuln_count
+        run: |
+          report_file="report.json"
+          vuln_count=$(jq 'if .Results then [.Results[] | select(.Class=="os-pkgs" and .Vulnerabilities!=null) | .Vulnerabilities[]] | length else 0 end' "$report_file")
+          echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
+
+      
