@@ -90,11 +90,11 @@ jobs:
 
         # check whether there are any OS package vulnerabilities
       - name: Check vulnerability count on patched image
-        id: vuln_count
+        id: vuln_count_patch
         run: |
           report_file="report.json"
-          vuln_count=$(jq 'if .Results then [.Results[] | select(.Class=="os-pkgs" and .Vulnerabilities!=null) | .Vulnerabilities[]] | length else 0 end' "$report_file")
-          echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
-          echo $GITHUB_OUTPUT
+          vuln_count_patch=$(jq 'if .Results then [.Results[] | select(.Class=="os-pkgs" and .Vulnerabilities!=null) | .Vulnerabilities[]] | length else 0 end' "$report_file")
+          echo "vuln_count_patch=$vuln_count_patch" >> $GITHUB_OUTPUT_PATCH
+          echo $GITHUB_OUTPUT_PATCH
 
       
