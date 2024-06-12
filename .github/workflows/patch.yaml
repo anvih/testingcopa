@@ -21,7 +21,6 @@ jobs:
         # provide relevant list of images to scan on each run
         images:
           - "docker.io/library/alpine:3.18.4"
-          - "docker.io/openpolicyagent/opa:0.46.0"
           - "docker.io/library/hello-world:latest"
     steps:
       # generate trivy report for fixable OS package vulnerabilities
