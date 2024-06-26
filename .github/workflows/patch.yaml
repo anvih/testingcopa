@@ -94,7 +94,8 @@ jobs:
         run: |
           report_file_patch="reportafterpatch.json"
           vuln_count_patch=$(jq 'if .Results then [.Results[] | select(.Class=="os-pkgs" and .Vulnerabilities!=null) | .Vulnerabilities[]] | length else 0 end' "$report_file_patch")
-          echo "vuln_count_patch=$vuln_count_patch" >> $GITHUB_OUTPUT_PATCH
-          echo $GITHUB_OUTPUT_PATCH
+          echo $vuln_count_patch
+          #echo "vuln_count_patch=$vuln_count_patch" >> $GITHUB_OUTPUT_PATCH
+          #echo $GITHUB_OUTPUT_PATCH
 
       
